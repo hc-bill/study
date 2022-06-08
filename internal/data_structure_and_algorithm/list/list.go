@@ -1,18 +1,25 @@
 package list
 
-type listNode struct {
+/*
+	链表
+		头节点: 指的是链表第一个节点
+		头指针: 指的是指向头节点的指针
+*/
+
+type ListNode struct {
 	Data int
-	Next *listNode
+	Next *ListNode
 }
 
-func (ln *listNode) Traverse() {
-	markListNode := ln
-	for markListNode != nil {
-		markListNode = markListNode.Next
+// Traverse 遍历
+func (ln *ListNode) Traverse() {
+	for mln := ln; mln != nil; mln = mln.Next {
+		println(mln.Data)
 	}
 }
 
-func (ln *listNode) FindValue(value int) *listNode {
+// FindValue 查询链表中的值
+func (ln *ListNode) FindValue(value int) *ListNode {
 	mln := ln
 	for mln != nil {
 		if mln.Data == value {
@@ -23,35 +30,35 @@ func (ln *listNode) FindValue(value int) *listNode {
 	return nil
 }
 
-func (ln *listNode) HeadInsert(value int) {
-	newNode := &listNode{value, nil}
-	if ln == nil {
-		ln = newNode
-	} else {
-		newNode.Next = ln.Next
-		ln.Next = newNode
-	}
+// HeadInsert 头插
+func (ln *ListNode) HeadInsert(value int) {
+	newNode := &ListNode{value, nil}
+	// 先将新节点的 Next 连到链表上,防止断链,再进行插入操作
+	newNode.Next = ln
+	ln = newNode
 }
 
-func (ln *listNode) TailInsert(value int) {
-	newNode := &listNode{value, nil}
+// TailInsert 尾插
+func (ln *ListNode) TailInsert(value int) {
+	newNode := &ListNode{value, nil}
 	if ln == nil {
 		ln.Next = newNode
 	} else {
 		mln := ln
 		// find tail node
-		for mln != nil {
+		for mln.Next != nil {
 			mln = mln.Next
 		}
-		mln = newNode
+		mln.Next = newNode
 	}
 }
 
 // 尾部结点
-var tail = &listNode{}
+var tail *ListNode = nil
 
-func (ln *listNode) GreatTailInsert(value int) {
-	newNode := &listNode{value, nil}
+// WithTailNodeOfTailInsert 带尾部节点的尾插
+func (ln *ListNode) WithTailNodeOfTailInsert(value int) {
+	newNode := &ListNode{value, nil}
 	if ln == nil {
 		ln.Next = newNode
 	} else {
@@ -59,52 +66,68 @@ func (ln *listNode) GreatTailInsert(value int) {
 	}
 }
 
-func (ln *listNode) LocationInsert(p *listNode, value int) {
-	newNode := &listNode{value, nil}
+func (ln *ListNode) LocationInsert(p *ListNode, value int) {
 	if p == nil || ln == nil {
 		return
 	} else {
 		mln := p
 
+		newNode := &ListNode{value, nil}
 		newNode.Next = mln.Next
 		p.Next = newNode
 	}
 }
 
-/*
-	1.找到前驱结点
-	2.删除结点
-*/
 // Delete 删除给定结点
-func (ln *listNode) Delete(p *listNode) {
+func (ln *ListNode) Delete(p *ListNode) {
 	if p == nil || ln == nil {
 		return
 	}
-	var prev *listNode
+
+	var pre *ListNode = nil
 	mln := ln
 	for mln != nil {
-		if mln == p {
+		if mln == p { // 找到要删除的节点
 			break
 		}
-		// 记录前驱结点
-		prev = mln
+
+		pre = mln // 记录要删除节点的前驱结点
 		mln = mln.Next
 	}
+
 	if mln == nil {
 		return
 	}
-	if prev == nil {
+	if pre == nil {
 		ln = ln.Next
 	} else {
-		prev.Next = prev.Next.Next
+		pre.Next = pre.Next.Next
 	}
-
 }
 
 // DeleteNextNode 删除给定结点之后的结点
-func (ln listNode) DeleteNextNode(p *listNode) {
+func (ln *ListNode) DeleteNextNode(p *ListNode) {
 	if p == nil || p.Next == nil {
 		return
 	}
 	p.Next = p.Next.Next
+}
+
+// Reverse 反转链表
+func (head *ListNode) Reverse() {
+	if head == nil {
+		return
+	}
+
+	var r *ListNode
+	newVirtualHeadListNode := &ListNode{Data: 0, Next: nil}
+	pre := head
+	head = newVirtualHeadListNode
+
+	for pre != nil {
+		r = pre
+		pre = pre.Next
+		r.Next = newVirtualHeadListNode.Next
+		newVirtualHeadListNode.Next = pre
+	}
 }
